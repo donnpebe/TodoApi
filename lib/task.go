@@ -1,6 +1,9 @@
 package lib
 
-import "labix.org/v2/mgo/bson"
+import (
+	"github.com/Unknwon/com"
+	"labix.org/v2/mgo/bson"
+)
 
 type Task struct {
 	Id   bson.ObjectId `bson:"_id" json:"id"`
@@ -19,6 +22,15 @@ func NewTask() *Task {
 func (task *Task) Clone() *Task {
 	cloneTask := *task
 	return &cloneTask
+}
+
+func sanitize(value string) string {
+	return com.Trim(com.HtmlEncode(value))
+}
+
+func (task *Task) Sanitize() *Task {
+	task.Name = sanitize(task.Name)
+	return task
 }
 
 func (task *Task) ToJSON() *TaskJSON {

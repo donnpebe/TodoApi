@@ -95,14 +95,16 @@ func CreateTaskHandler(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(task)
 	check(err)
 
+	objId := bson.NewObjectId()
+	task.Id = objId
+	task.Done = false
+
+	task.Sanitize()
+
 	valid, errs := validator.Validate(task)
 	if !valid {
 		check(errs)
 	}
-
-	objId := bson.NewObjectId()
-	task.Id = objId
-	task.Done = false
 
 	err = Collection.Insert(task)
 	check(err)
@@ -145,6 +147,8 @@ func UpdateTaskHandler(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(taskParams)
 	check(err)
+
+	taskParams.Sanitize()
 
 	valid, errs := validator.Validate(taskParams)
 	if !valid {
